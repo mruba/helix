@@ -1,0 +1,61 @@
+.App {
+  text-align: center;
+}
+
+.App-logo {
+  /*animation: App-logo-spin infinite 20s linear;*/
+  height: 150px;
+}
+
+.App-header {
+  /*height: 150px;*/
+  padding: 20px;
+  color: black;
+}
+
+.App-intro {
+  font-size: large;
+}
+
+.Webcam{
+  top: 0;
+  left: 0;
+  display: inline-block;
+  border-color: #a4c71d;
+  border-style: solid;
+  border-radius: 20px;
+  border-width: 25px;
+  visibility: ${(props) => props.hidden ? 'hidden' : 'visible'};
+  opacity: ${(props) => props.hidden ? '0' : '1'};
+  transition: all 500ms ease-in-out;
+  z-index: ${(props) => props.hidden ? '-10' : '9999'};
+
+}
+
+.Button{
+  display: inline-block;
+  box-sizing: border-box;
+  padding: 0.25em 2em;
+  text-decoration: none;
+  border-radius: 4px;
+  -webkit-font-smoothing: antialiased;
+  -webkit-touch-callout: none;
+  user-select: none;
+  cursor: pointer;
+  outline: 0;
+  font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+  font-weight: bold;
+  font-size: 20px;
+  border: 2px solid #41addd;
+  color: #41addd;
+
+  &:active {
+    background: #41addd;
+    color: #fff;
+  }
+}
+
+/*@keyframes App-logo-spin {
+  from { transform: scale(1); }
+  to { transform: scale(1.5); }
+}*/
