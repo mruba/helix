@@ -18,18 +18,24 @@
 }
 
 .Webcam{
-  top: 0;
+  top: 10px;
   left: 0;
   display: inline-block;
   border-color: #a4c71d;
   border-style: solid;
   border-radius: 20px;
   border-width: 25px;
-  visibility: ${(props) => props.hidden ? 'hidden' : 'visible'};
+
+  /*visibility: ${(props) => props.hidden ? 'hidden' : 'visible'};
   opacity: ${(props) => props.hidden ? '0' : '1'};
   transition: all 500ms ease-in-out;
-  z-index: ${(props) => props.hidden ? '-10' : '9999'};
-
+  z-index: ${(props) => props.hidden ? '-10' : '9999'};*/
+}
+.LoaderWraper{
+  padding: 200px;
+}
+.camWraping{
+  padding-top: 40px;
 }
 
 .Button{
@@ -46,16 +52,50 @@
   font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
   font-weight: bold;
   font-size: 20px;
-  border: 2px solid #41addd;
-  color: #41addd;
+  border: 2px solid #0071ce;
+  color: #0071ce;
 
   &:active {
     background: #41addd;
     color: #fff;
   }
 }
+.ButtonWraping{
+  padding: 50px 0px;
+}
 
-/*@keyframes App-logo-spin {
-  from { transform: scale(1); }
-  to { transform: scale(1.5); }
-}*/
+.interface{
+  display: table;
+  margin: 0 auto;
+  height: 128px;
+}
+
+.interface div{
+  height: 200px;
+  width: 200px;
+}
+
+p{
+  font-family: Avenir;
+font-size: 28px;
+
+}
+
+
+.chunkConteiner{
+  display: inline-flex;
+
+}
+
+.chunkConteiner p{
+  font-size: 16px;
+  line-height: 5px;
+  text-wrap:normal;
+}
+.chunkConteiner img{
+    height: 180px;
+}
+
+.product{
+  padding: 13px;
+}

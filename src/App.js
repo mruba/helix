@@ -2,7 +2,10 @@ import React, { Component } from 'react';
 import logo from './helix-logo.png';
 import './App.css';
 import Webcam from 'react-webcam';
-import AWSUtils from './AWSUtils'
+import AWSUtils from './AWSUtils';
+import Loader from 'halogen/RiseLoader';
+import v4 from 'uuid/v4'
+
 
 class App extends Component {
 
@@ -12,10 +15,21 @@ class App extends Component {
       // to display to the user and a spinner bool
       this.state = {
           messageText: null,
-          spinning: false
+          spinning: false,
+          visibleElement: 'webcam',
+          recommendations: null
       }
+      this.handleRecommendations = this.handleRecommendations.bind(this)
       this.handleMessage = this.handleMessage.bind(this)
       this.setSpinner = this.setSpinner.bind(this)
+      this.setVisibleElement = this.setVisibleElement.bind(this)
+      this.resetAllStates = this.resetAllStates.bind(this)
+  }
+
+  handleRecommendations(recommendations){
+    this.setState({
+      recommendations: recommendations
+    })
   }
 
   handleMessage(messageText) {
@@ -31,54 +45,111 @@ class App extends Component {
       })
   }
 
+  setVisibleElement(element, recommendations = []){
+    this.setState({
+      visibleElement: element,
+      recommendations: recommendations
+    })
+  }
+
   takePicture(){
-    const screenshot = this.refs.webcam.getScreenshot();
-    // this.setSpinner(true)
+    this.setSpinner(true)
+    this.setVisibleElement('spinner')
+    const screenshot = this.refs.webcam.getCanvas();
+
     let aws = new AWSUtils()
     this.handleMessage("Getting photo...")
-    console.log("Matching the face...")
-    this.handleMessage("Matching face...")
-    function dataURItoBlob(dataURI) {
-        if(typeof dataURI !== 'string'){
-            throw new Error('Invalid argument: dataURI must be a string');
-        }
-        dataURI = dataURI.split(',');
-        var type = dataURI[0].split(':')[1].split(';')[0],
-            byteString = atob(dataURI[1]),
-            byteStringLength = byteString.length,
-            arrayBuffer = new ArrayBuffer(byteStringLength),
-            intArray = new Uint8Array(arrayBuffer);
-        for (var i = 0; i < byteStringLength; i++) {
-            intArray[i] = byteString.charCodeAt(i);
-        }
-        return new Blob([intArray], {
-            type: type
-        });
-    }
 
-    aws.matchFace(dataURItoBlob(screenshot), this.handleMessage, this.setSpinner)
+    this.handleMessage("Sending to AWS Rekognition's API face search endpoint...")
+    var dataURL = screenshot.toDataURL('image/png');
+    let base64 = dataURL.replace(/^data:image\/(png|jpg);base64,/, "");
+
+    aws.matchFace(base64, this.handleMessage, this.setSpinner, this.setVisibleElement, this.handleRecommendations, this.resetAllStates)
   }
 
-  captureButton(){
-      if(!this.state.spinning){
-        return (
-          <div className="Button" onClick={this.takePicture.bind(this)}>
-            Press Me!
-          </div>)
+  resetAllStates(){
+    this.setState({
+      messageText: null,
+      spinning: false,
+      visibleElement: 'webcam',
+      recommendations: null
+    })
+  }
+
+  footerArea(){
+      if(this.state.messageText){
+        return(
+          <div className="interface">
+            <p>{this.state.messageText}</p>
+          </div>
+        )
+      }else{
+        return <div className="Button" onClick={this.takePicture.bind(this)}>Press Me!</div>
       }
   }
+
+  mainVisualArea(){
+    switch (this.state.visibleElement) {
+      case 'webcam':
+          return <Webcam  screenshotFormat={'image/png'} className="Webcam" ref="webcam" audio={false}/>
+        break;
+      case 'spinner':
+        return (<div className="LoaderWraper">
+                  <Loader color="#a4c722" size="60px" margin="4px"/>
+                </div>)
+        break;
+      case 'recommendations':
+        return(
+          <div>
+            {this.state.recommendations.map(chunk => (
+              <div key={v4()} className='chunkConteiner'>
+                <div  className="product" key={chunk[0].id}>
+                  <img src={chunk[0].imgSrc} />
+                  <p>{chunk[0].name}</p>
+                  <p>{chunk[0].description}</p>
+                  <p>{chunk[0].price}</p>
+                </div>
+                <div  className="product" key={chunk[1].id}>
+                  <img src={chunk[1].imgSrc} />
+                  <p>{chunk[1].name}</p>
+                  <p>{chunk[1].description}</p>
+                  <p>{chunk[1].price}</p>
+                </div>
+                <div  className="product" key={chunk[2].id}>
+                  <img src={chunk[2].imgSrc} />
+                  <p>{chunk[2].name}</p>
+                  <p>{chunk[2].description}</p>
+                  <p>{chunk[2].price}</p>
+                </div>
+              </div>
+            ))}
+            <div className="Button" onClick={this.resetAllStates}>Try Again!</div>
+          </div>
+        )
+        break;
+      default:
+        return <Webcam  screenshotFormat={'image/png'} className="Webcam" ref="webcam" audio={false}/>
+    }
+  }
+
 
   render() {
     return (
       <div className="App">
         <div className="App-header">
           <img src={logo} className="App-logo" alt="logo" />
-          <h2>Welcome to React</h2>
         </div>
-        <div>
-          <Webcam screenshotFormat={'image/png'} className="Webcam" ref="webcam" audio={false}/>
+
+        <div className="camWraper">
+          {this.mainVisualArea()}
+          {/* {this.interactionArea()} */}
         </div>
-          {this.captureButton()}
+
+        <div className="ButtonWraping">
+          {this.footerArea()}
+        </div>
+
+
       </div>
     );
   }
